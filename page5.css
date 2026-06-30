@@ -1,0 +1,271 @@
+/*
+  ============================================================
+  page5.css — The Memory: Pyramid Flip Card Styles
+  ============================================================
+  DESIGN: Fire (warm orange-red) + Khaki (warm beige-green)
+  color scheme on light, vibrant card fronts. Strong layered
+  box-shadows simulate a genuine 3D floating card appearance.
+
+  LAYOUT: CSS Grid creates the pyramid —
+    Row 1: [empty] [CARD 1] [empty]   <- centered top card
+    Row 2: [CARD 2] [empty] [CARD 3]  <- bottom-left / bottom-right
+
+  IMPROVEMENT IDEAS:
+  - Add a subtle floating bob animation to each card at rest
+  ============================================================
+*/
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  /* Rocket exhaust-inspired background: hot colors fading to cool smoke */
+  background: radial-gradient(ellipse at bottom center, 
+    #ff6b2c 0%,
+    #ff4500 15%,
+    #e63946 25%,
+    #d62828 40%,
+    #8b0000 55%,
+    #3a0a14 70%,
+    #1a0a1f 85%,
+    #0a0515 100%);
+  font-family: 'Georgia', serif;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+.memory-header {
+  text-align: center;
+  padding: 40px 20px 20px;
+  cursor: pointer; /* Indicates it's clickable to open profile */
+}
+
+.memory-header h1 {
+  font-size: 32px;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ff7a3d, #d4af6a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.memory-header p {
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+/* ── PYRAMID GRID LAYOUT ──────────────────────────────────── */
+/* 3 columns so the top card can sit centered (middle column),
+   and the bottom two cards occupy the outer columns. */
+.pyramid-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  max-width: 900px;
+  margin: 20px auto 80px;
+  padding: 20px;
+  gap: 40px 20px;
+  align-items: start;
+  justify-items: center;
+}
+
+/* Top card occupies the center column, row 1 */
+.slot-top {
+  grid-column: 2 / 3;
+  grid-row: 1;
+}
+
+/* Bottom-left card occupies column 1, row 2 */
+.slot-bottom-left {
+  grid-column: 1 / 2;
+  grid-row: 2;
+}
+
+/* Bottom-right card occupies column 3, row 2 */
+.slot-bottom-right {
+  grid-column: 3 / 4;
+  grid-row: 2;
+}
+
+/* ── MEMORY CARD (3D flip container) ─────────────────────── */
+.memory-card {
+  position: relative;
+  width: 220px;
+  aspect-ratio: 9 / 16; /* Per original request: 9:16 portrait cards */
+  border-radius: 18px;
+  cursor: pointer;
+  perspective: 1200px; /* Enables the 3D flip illusion on the child */
+
+  /* Layered shadow stack simulates real depth/elevation off the page */
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.4))
+          drop-shadow(0 10px 20px rgba(0,0,0,0.5))
+          drop-shadow(0 20px 40px rgba(0,0,0,0.35));
+
+  transition: transform 0.3s ease;
+}
+
+.memory-card:hover {
+  transform: translateY(-6px); /* Lift slightly on hover for tactile feedback */
+}
+
+/* Pixel-dissolve canvas overlay, absolutely covers the card */
+.pixel-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  pointer-events: none; /* Let clicks pass through to the card below */
+  z-index: 5;
+}
+
+/* The flipping inner wrapper — this is what actually rotates */
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d; /* Children keep their own 3D position during rotation */
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  border-radius: 18px;
+}
+
+/* When a card has the 'flipped' class (toggled by JS), rotate it 180° */
+.memory-card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Both card faces (front and back) stack exactly on top of each other */
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  backface-visibility: hidden; /* Hides the face when it's turned away from viewer */
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+/* ── FRONT FACE COLOR THEMES ──────────────────────────────── */
+/* Light, vibrant gradients per the "show some light colors" request */
+.front-fire {
+  background: linear-gradient(145deg, #ffb37a 0%, #ff7a3d 50%, #e85a2a 100%);
+  /* Inner highlight + shadow for a glassy 3D surface feel */
+  box-shadow: inset 0 2px 12px rgba(255,255,255,0.5), inset 0 -10px 30px rgba(0,0,0,0.15);
+}
+
+.front-khaki {
+  background: linear-gradient(145deg, #f0e4b8 0%, #d4c285 50%, #b8a05f 100%);
+  box-shadow: inset 0 2px 12px rgba(255,255,255,0.6), inset 0 -10px 30px rgba(0,0,0,0.12);
+}
+
+.card-emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+}
+
+.card-label {
+  font-family: 'Georgia', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #3a2410;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+}
+
+/* ── BACK FACE ────────────────────────────────────────────── */
+.card-back {
+  background: linear-gradient(145deg, #2a2018, #1a1410);
+  transform: rotateY(180deg); /* Pre-rotated so it faces correctly once flipped */
+  border: 1px solid rgba(255, 122, 61, 0.3);
+}
+
+.card-back h3 {
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: #ffb37a;
+}
+
+.card-back p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #cbb;
+  opacity: 0.85;
+}
+
+/* ── PROFILE MODAL (same 3D popup pattern as page0) ──────── */
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+
+.profile-modal {
+  background: #1a1410;
+  border: 1px solid rgba(255,122,61,0.3);
+  border-radius: 16px;
+  padding: 36px 28px;
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 2px 0 1px #2a2018, 0 8px 0 2px #221a14, 0 20px 50px rgba(0,0,0,0.7);
+  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.85) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  background: transparent; border: 1px solid rgba(255,122,61,0.3);
+  color: #ccc; width: 26px; height: 26px; border-radius: 50%;
+  cursor: pointer; font-size: 11px;
+}
+
+.modal-avatar {
+  width: 70px; height: 70px; border-radius: 50%;
+  background: linear-gradient(135deg, #ff7a3d, #d4af6a);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px; font-size: 26px; font-weight: 700; color: #1a1410;
+}
+
+.modal-name { font-size: 16px; margin-bottom: 4px; color: #ffb37a; }
+.modal-title { font-size: 11px; color: #d4af6a; margin-bottom: 12px; letter-spacing: 1px; }
+.modal-bio { font-size: 12px; color: #bbb; line-height: 1.6; }
+
+/* ── RESPONSIVE: MOBILE ───────────────────────────────────── */
+/* On narrow screens, stack the pyramid into a single column
+   since 3-column grid can't comfortably fit. */
+@media (max-width: 640px) {
+  .pyramid-wrap {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 24px;
+  }
+  .slot-top, .slot-bottom-left, .slot-bottom-right {
+    grid-column: 1;
+  }
+  .slot-top { grid-row: 1; }
+  .slot-bottom-left { grid-row: 2; }
+  .slot-bottom-right { grid-row: 3; }
+  .memory-card { width: 200px; }
+}

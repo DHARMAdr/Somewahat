@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  page6.html — Analog Radio Player
+  ============================================================
+  PURPOSE: A retro-styled analog radio with play/pause/skip
+  controls, a small display screen showing the current track
+  name, and rotating motivational/gaming quotes.
+
+  NOTE ON AUDIO: Since this portal has no backend/server and
+  must work as static files, this page uses royalty-free audio
+  preview URLs is NOT reliable without hosting actual files.
+  Instead, this implementation uses the Web Audio API to
+  GENERATE simple ambient tones/melodies in-browser (no external
+  audio files needed at all) — so it works immediately when you
+  open the file, with zero setup. See page6.js comments for how
+  to swap in your own real MP3 files later.
+
+  STRUCTURE:
+  - <div class="radio-body">: The visual radio shell (dial, speaker grille)
+  - <div class="radio-screen">: Shows track name + quote
+  - <div class="radio-controls">: Play/Pause/Prev/Next/Volume
+
+  IMPROVEMENT IDEAS:
+  - Replace the generated tones with real licensed MP3 files
+  - Add a visual equalizer animation synced to actual audio frequency data
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analog Radio — Page 7/7</title>
+  <link rel="stylesheet" href="page6.css" />
+</head>
+<body>
+
+  <div class="radio-stage">
+
+    <!-- ── THE RADIO BODY ── -->
+    <div class="radio-body">
+
+      <!-- Brand plate -->
+      <div class="radio-brand">LAZYDANGER · RADIO</div>
+
+      <!-- Speaker grille (decorative dots) -->
+      <div class="speaker-grille" id="speakerGrille"></div>
+
+      <!-- Display screen: shows track name + scrolling quote -->
+      <div class="radio-screen">
+        <div class="screen-row track-row">
+          <span class="screen-label">NOW PLAYING</span>
+          <span class="screen-track" id="trackName">Loading...</span>
+        </div>
+        <div class="screen-row quote-row">
+          <span class="screen-quote" id="quoteText">"Press play to begin."</span>
+        </div>
+        <div class="screen-row visualizer-row" id="visualizer">
+          <!-- Bars injected by JS -->
+        </div>
+      </div>
+
+      <!-- Tuning dial (decorative + functional volume control) -->
+      <div class="dial-row">
+        <div class="dial-wrap">
+          <div class="dial-knob" id="volumeKnob"></div>
+          <span class="dial-label">VOLUME</span>
+        </div>
+
+        <!-- Playback controls -->
+        <div class="controls-wrap">
+          <button class="ctrl-btn" id="prevBtn" aria-label="Previous track">⏮</button>
+          <button class="ctrl-btn ctrl-play" id="playBtn" aria-label="Play or pause">▶</button>
+          <button class="ctrl-btn" id="nextBtn" aria-label="Next track">⏭</button>
+        </div>
+
+        <div class="dial-wrap">
+          <div class="dial-knob" id="tuneKnob"></div>
+          <span class="dial-label">TUNE</span>
+        </div>
+      </div>
+
+      <!-- Antenna -->
+      <div class="antenna"></div>
+    </div>
+
+    <p class="radio-hint">Drag the volume knob · Click play to start</p>
+  </div>
+
+  <script src="page6.js"></script>
+  <script src="nav.js"></script>
+</body>
+</html>

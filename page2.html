@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  page2.html — Cosmic Galaxy Page
+  ============================================================
+  PURPOSE: A layered cosmic scene with a real swirling spiral
+  galaxy made of 6000+ particles, plus atmospheric overlay
+  layers (nebula clouds, twinkling stars, zooming starfield,
+  glowing core) for depth.
+
+  LAYER ORDER (back to front):
+  1. .nebula-layer    — slow rotating colored cloud gradients
+  2. .star-layer      — small twinkling fixed stars
+  3. .starfield-layer — stars that appear to zoom toward viewer
+  4. .core-glow       — glowing center of the galaxy
+  5. #galaxyCanvas     — the actual particle spiral (drawn on top)
+
+  IMPROVEMENT IDEAS:
+  - Add mouse-parallax so layers shift slightly with cursor movement
+  - Let the user click to add a "supernova" burst effect
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxy Swirl — Page 3/7</title>
+  <link rel="stylesheet" href="page2.css" />
+</head>
+<body>
+
+  <!-- Layer 1: Rotating nebula cloud gradients -->
+  <div class="nebula-layer"></div>
+
+  <!-- Layer 2: Small twinkling stars (CSS-generated) -->
+  <div class="star-layer" id="starLayer"></div>
+
+  <!-- Layer 3: Zooming starfield effect -->
+  <div class="starfield-layer" id="starfieldLayer"></div>
+
+  <!-- Layer 4: Glowing galaxy core -->
+  <div class="core-glow"></div>
+
+  <!-- Layer 5: Canvas — the actual spiral galaxy particle system -->
+  <canvas id="galaxyCanvas"></canvas>
+
+  <!-- Title overlay -->
+  <div class="galaxy-title">
+    <h1>Galaxy Swirl</h1>
+    <p>6,000+ particles · spiral structure</p>
+  </div>
+
+  <script src="page2.js"></script>
+  <script src="nav.js"></script>
+</body>
+</html>

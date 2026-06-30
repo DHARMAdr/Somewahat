@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  page5.html — The Memory (Pyramid Flip Cards)
+  ============================================================
+  PURPOSE: Three flip cards arranged in a PYRAMID layout
+  (card 1 top-center, cards 2 & 3 bottom-left/bottom-right).
+  Each card combines:
+   - A 3D flip animation (rotateY 180°) to reveal the back
+   - A "PixelCard" style pixel-dissolve hover/focus effect
+     (ported from React Bits PixelCard to vanilla JS/canvas)
+   - Light, vibrant front colors with 3D depth shadows
+
+  STRUCTURE:
+  - <div class="pyramid-wrap">: CSS grid positioning the 3 cards
+  - Each .memory-card contains a canvas (pixel effect) + flip inner content
+  - <div#profile-modal>: Clicking the header opens a profile popup
+
+  IMPROVEMENT IDEAS:
+  - Add drag-to-reorder so users can rearrange the pyramid
+  - Add real photo uploads instead of gradient placeholders
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Memory — Page 6/7</title>
+  <link rel="stylesheet" href="page5.css" />
+</head>
+<body>
+
+  <header class="memory-header" id="memoryHeader">
+    <h1>The Memory</h1>
+    <p>Click a card to flip it · Click here for profile</p>
+  </header>
+
+  <!-- Pyramid layout: 1 card on top row, 2 cards on bottom row -->
+  <div class="pyramid-wrap">
+
+    <!-- ── CARD 1: TOP CENTER ── -->
+    <div class="pyramid-slot slot-top">
+      <div class="memory-card" data-card="1">
+        <canvas class="pixel-canvas"></canvas>
+        <div class="card-inner">
+          <div class="card-face card-front front-fire">
+            <span class="card-emoji">🔥</span>
+            <span class="card-label">Memory One</span>
+          </div>
+          <div class="card-face card-back">
+            <h3>First Stream</h3>
+            <p>The night it all began — 12 viewers and pure chaos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CARD 2: BOTTOM LEFT ── -->
+    <div class="pyramid-slot slot-bottom-left">
+      <div class="memory-card" data-card="2">
+        <canvas class="pixel-canvas"></canvas>
+        <div class="card-inner">
+          <div class="card-face card-front front-khaki">
+            <span class="card-emoji">🏆</span>
+            <span class="card-label">Memory Two</span>
+          </div>
+          <div class="card-face card-back">
+            <h3>First Win</h3>
+            <p>Clutched the final round on camera. Chat lost it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CARD 3: BOTTOM RIGHT ── -->
+    <div class="pyramid-slot slot-bottom-right">
+      <div class="memory-card" data-card="3">
+        <canvas class="pixel-canvas"></canvas>
+        <div class="card-inner">
+          <div class="card-face card-front front-fire">
+            <span class="card-emoji">🎉</span>
+            <span class="card-label">Memory Three</span>
+          </div>
+          <div class="card-face card-back">
+            <h3>10K Followers</h3>
+            <p>The milestone stream. Cried a little. Don't tell anyone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Profile modal popup (3D effect), opened via the header -->
+  <div class="profile-modal-overlay" id="profileModalOverlay" aria-hidden="true">
+    <div class="profile-modal" id="profileModal">
+      <button class="modal-close" id="modalClose" aria-label="Close profile">✕</button>
+      <div class="modal-avatar"><span>L</span></div>
+      <h3 class="modal-name">@iamlazydanger</h3>
+      <p class="modal-title">Gaming Content Creator</p>
+      <p class="modal-bio">These memories are the highlights of the journey so far. More to come.</p>
+    </div>
+  </div>
+
+  <script src="page5.js"></script>
+  <script src="nav.js"></script>
+</body>
+</html>

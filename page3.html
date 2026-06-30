@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  page3.html — Flowing Strands Page
+  ============================================================
+  PURPOSE: Recreates the "React Bits <Strands />" component using
+  plain HTML + vanilla JS + raw WebGL (no React, no build tools,
+  no npm package 'ogl'). The exact same GLSL fragment shader logic
+  from the original component is reused so the visual OUTPUT
+  matches, while the wrapper code is hand-rolled WebGL instead of
+  the 'ogl' library.
+
+  WHY WEBGL DIRECTLY: The original component renders its visuals
+  entirely on the GPU via a fragment shader. Translating to "plain
+  JS" means writing the WebGL boilerplate (compile shader, create
+  buffer, render loop) ourselves instead of using the `ogl` helper
+  library — but the shader math, and therefore the look, stays
+  identical.
+
+  IMPROVEMENT IDEAS:
+  - Expose the props (count, speed, colors, etc.) as on-screen sliders
+  - Add a toggle for the "glass" refraction mode (shader included but unused)
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flowing Strands — Page 4/7</title>
+  <link rel="stylesheet" href="page3.css" />
+</head>
+<body>
+
+  <!-- Container the strands canvas fills, matching the original component's wrapper div -->
+  <div class="strands-container" id="strandsContainer">
+    <canvas id="strandsCanvas"></canvas>
+  </div>
+
+  <!-- Title overlay -->
+  <div class="strands-title">
+    <h1>Flowing Strands</h1>
+    <p>4 ribbons · vibrant glow · WebGL shader</p>
+  </div>
+
+  <script src="page3.js"></script>
+  <script src="nav.js"></script>
+</body>
+</html>

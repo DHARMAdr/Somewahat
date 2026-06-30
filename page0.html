@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  page0.html — @iamlazydanger Gaming Blog (Landing Page)
+  ============================================================
+  PURPOSE: The main entry point of the portal. A styled gaming
+  blog with a featured hero post, grid of 6 posts, live search,
+  category filters, profile modal, and a chat widget.
+
+  STRUCTURE:
+  - <head>: Meta tags, Google Fonts, link to page0.css
+  - <nav>: Top navigation bar with logo + profile icon
+  - <section.hero>: Large featured post banner
+  - <section.blog-section>: Search + filters + post grid
+  - <div#profile-modal>: Hidden profile popup
+  - <div#chat-widget>: Floating chat bubble
+  - <script>: Links to page0.js and nav.js
+
+  IMPROVEMENT IDEAS:
+  - Add a dark/light mode toggle
+  - Paginate blog posts (load more button)
+  - Connect to a real CMS (like Contentful or Sanity)
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@iamlazydanger — Gaming Portal</title>
+
+  <!-- Google Fonts: Orbitron for gaming headings, Inter for body text -->
+  <!-- WHY ORBITRON: It's a geometric sci-fi font that screams gaming/tech -->
+  <!-- WHY INTER: Clean, readable, works great at small sizes for blog text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="page0.css" />
+</head>
+<body>
+
+  <!-- ── TOP NAVIGATION BAR ── -->
+  <!-- WHY: Persistent nav gives the user brand context + quick access to profile -->
+  <nav class="topnav">
+    <!-- Logo / Brand name -->
+    <div class="nav-logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-text">@iamlazydanger</span>
+      <span class="logo-bracket">]</span>
+    </div>
+
+
+
+    <!-- Profile icon (Gmail-style circle, top-right) -->
+    <!-- Clicking this opens the profile modal popup -->
+    <button class="profile-icon-btn" id="profileIconBtn" aria-label="Open profile">
+      <span class="profile-initial">L</span>
+    </button>
+  </nav>
+
+  <!-- ── HERO FEATURED POST ── -->
+  <!-- WHY: A large visual hero grabs attention immediately and sets tone -->
+  <section class="hero">
+    <div class="hero-bg"></div><!-- Animated gradient background layer -->
+    <div class="hero-content">
+      <span class="hero-tag">FEATURED · REVIEW</span>
+      <h1 class="hero-title">The Ultimate Gaming Setup Guide 2026</h1>
+      <p class="hero-subtitle">
+        From GPU picks to monitor refresh rates — everything you need to
+        dominate the competition this year.
+      </p>
+      <div class="hero-meta">
+        <span class="hero-author">@iamlazydanger</span>
+        <span class="hero-dot">·</span>
+        <span class="hero-date">June 2026</span>
+        <span class="hero-dot">·</span>
+        <span class="hero-read">8 min read</span>
+      </div>
+      <a href="#" class="hero-btn">Read Article →</a>
+    </div>
+  </section>
+
+  <!-- ── BLOG SECTION: SEARCH + FILTERS + GRID ── -->
+  <section class="blog-section">
+    <div class="blog-header">
+      <h2 class="blog-section-title">Latest Posts</h2>
+
+      <!-- Live search input — filters posts as you type -->
+      <!-- WHY: Instant feedback is better UX than a submit button search -->
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search posts..."
+          aria-label="Search blog posts"
+        />
+      </div>
+    </div>
+
+    <!-- Category filter pills -->
+    <!-- WHY PILLS: Visual, touch-friendly, easy to scan at a glance -->
+    <div class="filter-pills" id="filterPills">
+      <button class="pill active" data-filter="all">All</button>
+      <button class="pill" data-filter="review">Review</button>
+      <button class="pill" data-filter="guide">Guide</button>
+      <button class="pill" data-filter="tips">Tips</button>
+      <button class="pill" data-filter="hardware">Hardware</button>
+    </div>
+
+    <!-- Blog posts grid — populated by JavaScript (page0.js) -->
+    <!-- WHY JS-GENERATED: Makes it easy to add/edit posts by just changing
+         the 'posts' array in page0.js without touching HTML -->
+    <div class="posts-grid" id="postsGrid">
+      <!-- Posts injected here by JavaScript -->
+    </div>
+
+    <!-- Empty state message (shown when search finds nothing) -->
+    <div class="no-results" id="noResults" style="display:none;">
+      <span class="no-results-icon">🎮</span>
+      <p>No posts found. Try a different search!</p>
+    </div>
+  </section>
+
+  <!-- ── PROFILE MODAL POPUP ── -->
+  <!-- WHY: A profile popup gives visitors context about who @iamlazydanger is -->
+  <!-- This is hidden by default (display:none in CSS), toggled by JS -->
+  <div class="profile-modal-overlay" id="profileModalOverlay" aria-hidden="true">
+    <div class="profile-modal" id="profileModal">
+      <!-- Close button -->
+      <button class="modal-close" id="modalClose" aria-label="Close profile">✕</button>
+
+      <!-- Profile avatar -->
+      <div class="modal-avatar">
+        <span class="modal-initial">L</span>
+      </div>
+
+      <!-- Profile info -->
+      <h3 class="modal-name">@iamlazydanger</h3>
+      <p class="modal-title">Gaming Content Creator · Streamer · Review</p>
+
+      <!-- Short bio -->
+      <p class="modal-bio">
+        Full-time gamer, part-time sleeping. I review games, break down hardware,
+        and share tips that actually work. Follow the journey.
+      </p>
+
+      <!-- Social links -->
+      <div class="modal-socials">
+        <a href="#" class="social-btn twitch">Twitch</a>
+        <a href="#" class="social-btn youtube">YouTube</a>
+        <a href="#" class="social-btn twitter">Twitter/X</a>
+        <a href="#" class="social-btn kick">Kick</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FLOATING CHAT WIDGET ── -->
+  <!-- WHY: Lets visitors send messages without leaving the page -->
+  <div class="chat-widget" id="chatWidget">
+    <!-- Chat toggle button (floating bubble) -->
+    <button class="chat-bubble" id="chatBubble" aria-label="Open chat">
+      <span class="chat-icon">💬</span>
+    </button>
+
+    <!-- Chat panel (hidden by default) -->
+    <div class="chat-panel" id="chatPanel" aria-hidden="true">
+      <div class="chat-header">
+        <span>Send a Message</span>
+        <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
+      </div>
+
+      <div class="chat-body">
+        <input type="text" id="chatName" placeholder="Your name" class="chat-input" />
+        <textarea id="chatMessage" placeholder="Your message..." class="chat-textarea" rows="3"></textarea>
+        <button class="chat-send" id="chatSend">Send →</button>
+        <p class="chat-status" id="chatStatus"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCRIPTS ── -->
+  <!-- page0.js handles all logic for this page (search, filters, modal, chat) -->
+  <script src="page0.js"></script>
+
+  <!-- nav.js handles keyboard navigation between pages -->
+  <!-- WHY LAST: nav.js hooks onto keyboard events, so DOM must be ready first -->
+  <script src="nav.js"></script>
+
+</body>
+</html>

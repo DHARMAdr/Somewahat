@@ -1,0 +1,66 @@
+/*
+  ============================================================
+  page3.css — Flowing Strands Page Styles
+  ============================================================
+  DESIGN: Dark background lets the glowing strand colors
+  (magenta, lime, cyan, gold) pop. The container/canvas sizing
+  mirrors the original React component's CSS exactly.
+
+  IMPROVEMENT IDEAS:
+  - Add a subtle vignette to focus attention toward the center
+  ============================================================
+*/
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #050507; /* Deep near-black, slightly cooler than pure black */
+}
+
+/* ── STRANDS CONTAINER ───────────────────────────────────── */
+/* This mirrors the original component's `.strands-container` class exactly */
+.strands-container {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.strands-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── TITLE OVERLAY ───────────────────────────────────────── */
+.strands-title {
+  position: fixed;
+  bottom: 32px;
+  left: 32px;
+  z-index: 10;
+  color: #fff;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  pointer-events: none;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.strands-title h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  background: linear-gradient(90deg, #ff2ec4, #b6ff2e, #2ed8ff, #ffd02e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.strands-title p {
+  font-size: 12px;
+  opacity: 0.5;
+  letter-spacing: 1px;
+}

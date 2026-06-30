@@ -1,0 +1,805 @@
+/*
+  ============================================================
+  page0.css — @iamlazydanger Gaming Blog Styles
+  ============================================================
+  DESIGN PHILOSOPHY:
+  Dark gaming aesthetic. Deep blacks, electric cyan accents,
+  neon red highlights. Typography: Orbitron for headings (sci-fi
+  gaming vibe), Inter for body (clean readability).
+
+  COLOR PALETTE:
+  --bg-base: #080808       — Near-black base background
+  --bg-card: #111118       — Slightly lighter card backgrounds
+  --bg-card-hover: #1a1a28 — Card hover state
+  --accent-cyan: #00e5ff   — Primary accent (electric cyan)
+  --accent-red: #ff2244    — Secondary accent (danger red)
+  --accent-purple: #9b4dff — Tertiary accent (purple glow)
+  --text-primary: #f0f0f0  — Main text (not pure white, less harsh)
+  --text-muted: #888        — Subdued text for meta info
+  --border: #222233        — Subtle borders
+
+  IMPROVEMENT IDEAS:
+  - Add CSS custom property theming for dark/light toggle
+  - Add container queries for more flexible responsive layout
+  - Use @layer to better organize specificity
+  ============================================================
+*/
+
+/* ── CSS CUSTOM PROPERTIES (Design Tokens) ──────────────── */
+/* WHY: Centralizing values means you only change one place   */
+:root {
+  --bg-base: #080808;
+  --bg-card: #111118;
+  --bg-card-hover: #1a1a28;
+  --accent-cyan: #00e5ff;
+  --accent-red: #ff2244;
+  --accent-purple: #9b4dff;
+  --accent-gold: #ffd600;
+  --text-primary: #f0f0f0;
+  --text-muted: #888;
+  --text-dim: #555;
+  --border: #1e1e2e;
+  --border-bright: #333355;
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Inter', sans-serif;
+  --radius: 8px;
+  --radius-lg: 16px;
+  --shadow-glow-cyan: 0 0 20px rgba(0, 229, 255, 0.3);
+  --shadow-glow-red: 0 0 20px rgba(255, 34, 68, 0.3);
+  --transition: 0.25s ease;
+}
+
+/* ── RESET & BASE ───────────────────────────────────────── */
+/* WHY: Browser default styles vary and can cause layout issues */
+*, *::before, *::after {
+  box-sizing: border-box; /* Include padding/border in width calculations */
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth; /* Smooth scrolling for anchor links */
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scroll from animations */
+}
+
+/* ── SCROLLBAR STYLING ───────────────────────────────────── */
+/* WHY: Custom scrollbar matches the dark gaming aesthetic */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 3px; }
+
+/* ── TOP NAVIGATION ─────────────────────────────────────── */
+.topnav {
+  position: fixed; /* Stays at top while scrolling */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Above all other content */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+
+  /* Glassmorphism effect: semi-transparent dark background + blur */
+  /* WHY: Looks modern, lets hero content show through slightly */
+  background: rgba(8, 8, 8, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  border-bottom: 1px solid var(--border);
+}
+
+/* Logo container */
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.logo-bracket {
+  color: var(--accent-cyan);
+  font-weight: 900;
+}
+
+.logo-text {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Page label in the center of nav */
+.nav-page-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* Profile icon button (Gmail-style circle, top-right) */
+.profile-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Perfect circle */
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  border: 2px solid var(--accent-purple);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  outline: none;
+}
+
+.profile-icon-btn:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--shadow-glow-cyan);
+  transform: scale(1.1);
+}
+
+.profile-initial {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+}
+
+/* ── HERO SECTION ───────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 100vh; /* Full viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px 60px; /* Top padding accounts for fixed nav */
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Animated gradient background */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  /* Multi-layer gradient for depth and gaming vibes */
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(155, 77, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 20% 50%, rgba(255, 34, 68, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a14 0%, #080808 100%);
+  animation: heroBgPulse 8s ease-in-out infinite alternate;
+}
+
+/* Subtle pulsing animation for hero background */
+@keyframes heroBgPulse {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Grid overlay texture */
+/* WHY: Adds depth and a "digital world" texture to the hero */
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* All hero text content sits above the background layers */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+}
+
+/* "FEATURED · REVIEW" tag label */
+.hero-tag {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--accent-cyan);
+  padding: 4px 12px;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 100px;
+  margin-bottom: 24px;
+  animation: fadeInDown 0.6s ease;
+}
+
+/* Main hero headline */
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 56px); /* Responsive font size */
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  /* Gradient text effect */
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInDown 0.6s ease 0.1s both;
+}
+
+.hero-subtitle {
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInDown 0.6s ease 0.2s both;
+}
+
+/* Post meta: author · date · read time */
+.hero-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  animation: fadeInDown 0.6s ease 0.3s both;
+}
+
+.hero-author { color: var(--accent-cyan); font-weight: 600; }
+.hero-dot { color: var(--text-dim); }
+
+/* Read Article button */
+.hero-btn {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  color: #000;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: var(--transition);
+  animation: fadeInDown 0.6s ease 0.4s both;
+}
+
+.hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+/* Navigation hint at bottom of hero */
+.nav-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+kbd {
+  background: var(--border-bright);
+  border: 1px solid var(--text-dim);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  color: var(--accent-cyan);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ── BLOG SECTION ───────────────────────────────────────── */
+.blog-section {
+  padding: 60px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.blog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.blog-section-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+
+/* ── SEARCH INPUT ────────────────────────────────────────── */
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.search-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px 10px 38px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-primary);
+  width: 280px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.search-input::placeholder { color: var(--text-dim); }
+
+.search-input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.15);
+}
+
+/* ── FILTER PILLS ─────────────────────────────────────────── */
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1px solid var(--border-bright);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  outline: none;
+}
+
+.pill:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Active filter pill has solid background */
+.pill.active {
+  background: var(--accent-cyan);
+  color: #000;
+  border-color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+/* ── POSTS GRID ───────────────────────────────────────────── */
+/* CSS Grid: auto-fit creates as many columns as fit,
+   minmax(300px, 1fr) means each column is at least 300px wide */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+/* Individual post card */
+.post-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden; /* Clips the image corners */
+  transition: var(--transition);
+  cursor: pointer;
+  animation: fadeIn 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-card:hover {
+  border-color: var(--border-bright);
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Post thumbnail image area */
+.post-thumb {
+  width: 100%;
+  height: 180px;
+  object-fit: cover; /* Maintains aspect ratio while filling space */
+  display: block;
+  /* Fallback gradient when no image is provided */
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+/* Colored gradient thumbnail placeholders */
+.post-thumb-placeholder {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+/* Post card body (below thumbnail) */
+.post-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Fills remaining height so cards align at bottom */
+}
+
+/* Category tag (e.g. "REVIEW") */
+.post-tag {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 10px;
+  width: fit-content;
+  text-transform: uppercase;
+}
+
+/* Tag color by category */
+.tag-review   { background: rgba(255, 34, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(255,34,68,0.3); }
+.tag-guide    { background: rgba(0, 229, 255, 0.1);  color: var(--accent-cyan); border: 1px solid rgba(0,229,255,0.2); }
+.tag-tips     { background: rgba(155, 77, 255, 0.1); color: var(--accent-purple); border: 1px solid rgba(155,77,255,0.2); }
+.tag-hardware { background: rgba(255, 214, 0, 0.1);  color: var(--accent-gold); border: 1px solid rgba(255,214,0,0.2); }
+
+.post-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.post-excerpt {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  flex: 1; /* Pushes the meta to the bottom */
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.post-read-time {
+  color: var(--accent-cyan);
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* ── NO RESULTS STATE ─────────────────────────────────────── */
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  grid-column: 1 / -1; /* Span full grid width */
+}
+
+.no-results-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+
+/* ── PROFILE MODAL ─────────────────────────────────────────── */
+/* Overlay darkens the background when modal is open */
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: none; /* Hidden by default — shown by JS */
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-modal-overlay.open {
+  display: flex;
+  animation: fadeIn 0.2s ease;
+}
+
+/* The actual modal box */
+.profile-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+
+  /* 3D depth effect using layered box shadows */
+  /* WHY: Creates the illusion of a card floating off the screen */
+  box-shadow:
+    0 2px 0 1px #2a2a3a,
+    0 4px 0 2px #222232,
+    0 8px 0 3px #1a1a2a,
+    0 16px 40px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(155, 77, 255, 0.15);
+
+  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Spring-in */
+  transform-style: preserve-3d;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.85) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover { background: var(--accent-red); color: white; border-color: var(--accent-red); }
+
+/* Modal avatar circle */
+.modal-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  /* translateZ pushes this element forward in 3D space */
+  transform: translateZ(20px);
+  box-shadow: 0 8px 24px rgba(155, 77, 255, 0.4);
+}
+
+.modal-initial {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 900;
+  color: white;
+}
+
+.modal-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  transform: translateZ(15px);
+}
+
+.modal-title {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.modal-bio {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* Social link buttons row */
+.modal-socials {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.social-btn {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: white;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.social-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+.twitch  { background: #9146ff; }
+.youtube { background: #ff0000; }
+.twitter { background: #1da1f2; }
+.kick    { background: #53fc18; color: #000; }
+
+/* ── CHAT WIDGET ───────────────────────────────────────────── */
+.chat-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1500;
+}
+
+/* Floating chat bubble button */
+.chat-bubble {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 20px rgba(155, 77, 255, 0.4);
+  transition: var(--transition);
+}
+
+.chat-bubble:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 30px rgba(155, 77, 255, 0.6);
+}
+
+/* Chat panel that pops up when clicked */
+.chat-panel {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: none; /* Hidden by default */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.2s ease;
+}
+
+.chat-panel.open { display: block; }
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: white;
+  font-weight: 700;
+}
+
+.chat-close {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.chat-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+.chat-input,
+.chat-textarea {
+  background: var(--bg-base);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  resize: vertical; /* Only allow vertical resize for textarea */
+  width: 100%;
+  transition: var(--transition);
+}
+
+.chat-input:focus, .chat-textarea:focus { border-color: var(--accent-cyan); }
+.chat-input::placeholder, .chat-textarea::placeholder { color: var(--text-dim); }
+
+.chat-send {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 10px;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.chat-send:hover { filter: brightness(1.15); }
+
+.chat-status {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  text-align: center;
+  min-height: 16px;
+}
+
+/* ── ANIMATIONS ───────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE: MOBILE ───────────────────────────────────── */
+/* WHY: Gaming audience uses phones too — must look great on mobile */
+@media (max-width: 640px) {
+  .nav-page-label { display: none; } /* Save space on small screens */
+  .search-input { width: 180px; }
+  .posts-grid { grid-template-columns: 1fr; } /* Single column on mobile */
+  .hero-title { font-size: 28px; }
+  .chat-panel { width: 260px; }
+}

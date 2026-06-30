@@ -1,0 +1,141 @@
+/*
+  ============================================================
+  page2.css — Cosmic Galaxy Layer Styles
+  ============================================================
+  DESIGN: 5 stacked full-screen layers create a sense of depth.
+  Each layer uses position:fixed + inset:0 to fill the viewport
+  and z-index to control stacking order (back to front).
+
+  IMPROVEMENT IDEAS:
+  - Use CSS @property for animating gradient angles smoothly
+  - Add a subtle film-grain overlay for texture
+  ============================================================
+*/
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000005; /* Near-black with a hint of blue, deep space */
+}
+
+/* ── LAYER 1: NEBULA CLOUDS ──────────────────────────────── */
+/* Slow-rotating soft color blobs simulate distant nebula gas clouds */
+.nebula-layer {
+  position: fixed;
+  inset: -20%; /* Oversized so rotation never reveals empty edges */
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 40% 30% at 30% 30%, rgba(155, 89, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 45% at 70% 60%, rgba(255, 138, 196, 0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 50% 80%, rgba(89, 200, 255, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 80% 20%, rgba(255, 200, 120, 0.10) 0%, transparent 60%);
+  animation: nebulaRotate 120s linear infinite;
+  filter: blur(20px);
+}
+
+@keyframes nebulaRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── LAYER 2: TWINKLING STARS ────────────────────────────── */
+/* A grid of small radial-gradient "stars" generated via box-shadow trick in JS */
+.star-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  /* Individual stars are injected as <div> dots by page2.js */
+}
+
+.star-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50%      { opacity: 1; }
+}
+
+/* ── LAYER 3: ZOOMING STARFIELD ──────────────────────────── */
+/* Stars that scale up and fade, simulating forward motion through space */
+.starfield-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  perspective: 400px; /* Enables the 3D zoom illusion on child elements */
+}
+
+.zoom-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: zoomStar linear infinite;
+}
+
+@keyframes zoomStar {
+  0%   { transform: translateZ(-400px) scale(0.3); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateZ(200px) scale(2.5); opacity: 0; }
+}
+
+/* ── LAYER 4: GALAXY CORE GLOW ───────────────────────────── */
+/* A bright pulsing glow at the screen center representing the galactic core */
+.core-glow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 248, 220, 0.9) 0%, rgba(255, 220, 150, 0.4) 35%, transparent 70%);
+  animation: corePulse 4s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+@keyframes corePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+}
+
+/* ── LAYER 5: PARTICLE CANVAS ────────────────────────────── */
+/* The actual spiral galaxy, drawn on top of all atmospheric layers */
+#galaxyCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: block;
+}
+
+/* ── TITLE OVERLAY ────────────────────────────────────────── */
+.galaxy-title {
+  position: fixed;
+  bottom: 32px;
+  left: 32px;
+  z-index: 10;
+  color: #f0e8ff;
+  font-family: 'Georgia', serif;
+  pointer-events: none;
+  text-shadow: 0 0 20px rgba(155, 89, 255, 0.6);
+}
+
+.galaxy-title h1 {
+  font-size: 28px;
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+}
+
+.galaxy-title p {
+  font-size: 12px;
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
