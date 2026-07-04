@@ -1,207 +1,317 @@
 /**
  * ============================================================
- * page1.js — Dragon Cursor (SVG-based with Skull Mechanic)
+ * page0.js — @iamlazydanger Gaming Blog Logic
  * ============================================================
- * PURPOSE:
- *  1. A snake-like dragon made of 40 reusable SVG segments that
- *     follows the mouse/pointer cursor.
- *  2. When idle (pointer hasn't moved), the dragon's head wanders
- *     in a Lissajous-like curve, creating breathing/idle motion.
- *  3. Clicking anywhere spawns a skull at that location.
- *  4. Once a skull exists, the dragon slows to 20% speed and
- *     chases the nearest skull, eating it on contact.
- *  5. A 90-second timer runs silently in the background (no
- *     on-screen display), advancing to the next page when time expires.
+ * PURPOSE: Powers the landing page. Handles:
+ *  1. Rendering blog posts from a data array
+ *  2. Live search filtering
+ *  3. Category pill filtering
+ *  4. Profile modal open/close
+ *  5. Chat widget open/close + EmailJS-ready send logic
  *
- * ORIGINAL LOGIC: Pure vanilla JS + SVG, no external libraries.
- * The dragon uses a classic "follow the leader" chain physics
- * technique where each segment follows the one before it.
+ * WHY DATA-DRIVEN POSTS: Storing posts in a JS array (not hardcoded
+ * HTML) means anyone can add/edit/remove blog posts by just editing
+ * the `posts` array below — no HTML knowledge required.
  *
  * IMPROVEMENT IDEAS:
- *  - Add sound effect when eating a skull
- *  - Add particle effects on skull spawn
+ * - Move `posts` array to a separate JSON file fetched via fetch()
+ * - Add pagination or "load more" for 20+ posts
+ * - Persist search/filter state in the URL (query params)
  * ============================================================
  */
 
-"use strict";
+(function () {
+  "use strict";
 
-const screen = document.getElementById("screen");
-const xmlns = "http://www.w3.org/2000/svg";
-const xlinkns = "http://www.w3.org/1999/xlink";
+  // ─── CONFIG: IMAGE LINKS ───────────────────────────────────
+  /**
+   * IMAGE_LINKS: Central place to manage external image URLs.
+   * WHY: Easy for the client to swap in real photos later without
+   * digging through code — just replace the URL string here.
+   */
+  const IMAGE_LINKS = {
+    profilePicture: "", // e.g. "https://i.imgur.com/yourimage.jpg" — leave blank to use SVG initial
+  };
 
-// ─── VIEWPORT & DRAGON SETUP ───────────────────────────────
+  // ─── DATA: BLOG POSTS ──────────────────────────────────────
+  /**
+   * posts: Array of blog post objects.
+   * Each post has: id, title, excerpt, category, emoji (thumbnail
+   * placeholder), date, readTime.
+   *
+   * HOW TO ADD A POST: Copy an existing object, change the values,
+   * make sure `id` is unique.
+   */
+  const posts = [
+    {
+      id: 1,
+      title: "Top 5 Budget GPUs That Actually Run 2026 Titles",
+      excerpt: "You don't need a $2000 card to hit 1440p at 100fps. Here's what actually delivers.",
+      category: "hardware",
+      emoji: "🎮",
+      date: "Jun 24, 2026",
+      readTime: "6 min",
+    },
+    {
+      id: 2,
+      title: "Beginner's Guide to Competitive FPS Aim Training",
+      excerpt: "Stop blaming your mouse. These drills fixed my aim in three weeks flat.",
+      category: "guide",
+      emoji: "🎯",
+      date: "Jun 20, 2026",
+      readTime: "9 min",
+    },
+    {
+      id: 3,
+      title: "Review: The New Mechanical Keyboard Everyone's Talking About",
+      excerpt: "Hot-swappable switches, silent typing, and a price that doesn't hurt.",
+      category: "review",
+      emoji: "⌨️",
+      date: "Jun 15, 2026",
+      readTime: "5 min",
+    },
+    {
+      id: 4,
+      title: "5 Settings You're Probably Getting Wrong",
+      excerpt: "Sensitivity, FOV, and frame caps — small tweaks, massive difference.",
+      category: "tips",
+      emoji: "⚙️",
+      date: "Jun 10, 2026",
+      readTime: "4 min",
+    },
+    {
+      id: 5,
+      title: "Monitor Refresh Rates Explained: 144Hz vs 240Hz vs 360Hz",
+      excerpt: "Is the upgrade actually worth it, or just marketing? We tested all three.",
+      category: "guide",
+      emoji: "🖥️",
+      date: "Jun 5, 2026",
+      readTime: "7 min",
+    },
+    {
+      id: 6,
+      title: "Review: This Headset Has the Best Mic I've Ever Used",
+      excerpt: "Crystal clear comms and surprisingly good bass for the price point.",
+      category: "review",
+      emoji: "🎧",
+      date: "Jun 1, 2026",
+      readTime: "5 min",
+    },
+  ];
 
-window.addEventListener(
-  "pointermove",
-  (e) => {
-    pointer.x = e.clientX;
-    pointer.y = e.clientY;
-    rad = 0; // reset idle wander when pointer moves
-  },
-  false
-);
+  // ─── DOM REFERENCES ────────────────────────────────────────
+  // Caching DOM lookups in variables avoids repeated document.getElementById calls
+  const postsGrid = document.getElementById("postsGrid");
+  const noResults = document.getElementById("noResults");
+  const searchInput = document.getElementById("searchInput");
+  const filterPills = document.querySelectorAll(".pill");
 
-const resize = () => {
-  width = window.innerWidth;
-  height = window.innerHeight;
-};
+  const profileIconBtn = document.getElementById("profileIconBtn");
+  const profileModalOverlay = document.getElementById("profileModalOverlay");
+  const modalClose = document.getElementById("modalClose");
 
-let width, height;
-window.addEventListener("resize", () => resize(), false);
-resize();
+  const chatBubble = document.getElementById("chatBubble");
+  const chatPanel = document.getElementById("chatPanel");
+  const chatClose = document.getElementById("chatClose");
+  const chatSend = document.getElementById("chatSend");
+  const chatName = document.getElementById("chatName");
+  const chatMessage = document.getElementById("chatMessage");
+  const chatStatus = document.getElementById("chatStatus");
 
-/**
- * prepend(use, i)
- * Creates a <use> element referencing a shape by id, adds it to
- * the screen group, and stores a reference in elems[i].
- */
-const prepend = (use, i) => {
-  const elem = document.createElementNS(xmlns, "use");
-  elems[i].use = elem;
-  elem.setAttributeNS(xlinkns, "xlink:href", "#" + use);
-  screen.prepend(elem);
-};
+  // ─── STATE ─────────────────────────────────────────────────
+  let currentFilter = "all"; // which category pill is active
+  let currentSearch = "";    // current search text (lowercased)
 
-const N = 40; // dragon body segment count
+  // ─── RENDER POSTS ──────────────────────────────────────────
 
-const elems = [];
-for (let i = 0; i < N; i++) elems[i] = { use: null, x: width / 2, y: 0 };
+  /**
+   * renderPosts()
+   * Filters the `posts` array based on currentFilter + currentSearch,
+   * then builds and injects the HTML for each matching post card.
+   *
+   * WHY REBUILD EVERY TIME: Simpler than diffing the DOM manually.
+   * For 6-20 posts, full re-render is instant and not a performance issue.
+   */
+  function renderPosts() {
+    // Step 1: Filter by category
+    let filtered = posts.filter((post) => {
+      const matchesCategory = currentFilter === "all" || post.category === currentFilter;
+      const matchesSearch =
+        post.title.toLowerCase().includes(currentSearch) ||
+        post.excerpt.toLowerCase().includes(currentSearch);
+      return matchesCategory && matchesSearch;
+    });
 
-const pointer = { x: width / 2, y: height / 2 };
-const radm = Math.min(pointer.x, pointer.y) - 20;
-let frm = Math.random();
-let rad = 0;
-
-// Segment shape assignment: head, fins, body
-for (let i = 1; i < N; i++) {
-  if (i === 1) prepend("Cabeza", i);
-  else if (i === 8 || i === 14) prepend("Aletas", i);
-  else prepend("Espina", i);
-}
-
-// ─── SKULL MECHANIC ────────────────────────────────────────
-
-let skulls = []; // array of skull positions {x, y, eaten}
-let baseSpeed = 0.25; // normal dragon speed
-let currentSpeed = 0.1; // speed multiplier (affected by skull presence)
-
-/**
- * getNearestSkull()
- * Returns the closest uneaten skull to the dragon's head.
- */
-function getNearestSkull() {
-  if (skulls.length === 0) return null;
-  const head = elems[1];
-  let nearest = null;
-  let nearestDist = Infinity;
-  for (const skull of skulls) {
-    if (skull.eaten) continue;
-    const dx = skull.x - head.x;
-    const dy = skull.y - head.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < nearestDist) {
-      nearestDist = dist;
-      nearest = skull;
+    // Step 2: Show "no results" message if nothing matches
+    if (filtered.length === 0) {
+      postsGrid.innerHTML = "";
+      noResults.style.display = "block";
+      return;
     }
-  }
-  return nearest;
-}
+    noResults.style.display = "none";
 
-/**
- * Skull click handler: spawns a skull at click location.
- * Sets dragon speed to 20% (0.02).
- */
-window.addEventListener("click", (e) => {
-  skulls.push({
-    x: e.clientX,
-    y: e.clientY,
-    eaten: false,
+    // Step 3: Build HTML for each post card
+    // WHY map().join(""): Faster than repeated string concatenation in a loop
+    postsGrid.innerHTML = filtered
+      .map(
+        (post) => `
+      <a href="#" class="post-card" data-id="${post.id}">
+        <div class="post-thumb-placeholder" style="background:${getCategoryGradient(post.category)}">
+          ${post.emoji}
+        </div>
+        <div class="post-body">
+          <span class="post-tag tag-${post.category}">${post.category}</span>
+          <h3 class="post-title">${escapeHtml(post.title)}</h3>
+          <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+          <div class="post-meta">
+            <span>${post.date}</span>
+            <span class="post-read-time">${post.readTime} read</span>
+          </div>
+        </div>
+      </a>
+    `
+      )
+      .join("");
+  }
+
+  /**
+   * getCategoryGradient(category)
+   * Returns a CSS gradient string matching each category's accent color.
+   * WHY: Gives each thumbnail placeholder a unique, on-brand color
+   * instead of one flat gray box for every post.
+   */
+  function getCategoryGradient(category) {
+    const gradients = {
+      review: "linear-gradient(135deg, #2a0a14, #1a0508)",
+      guide: "linear-gradient(135deg, #062a30, #041820)",
+      tips: "linear-gradient(135deg, #1f0a30, #140520)",
+      hardware: "linear-gradient(135deg, #2a2206, #1a1504)",
+    };
+    return gradients[category] || "linear-gradient(135deg, #1a1a2e, #16213e)";
+  }
+
+  /**
+   * escapeHtml(str)
+   * Prevents HTML/script injection from post content.
+   * WHY: Even though our post data is hardcoded and trusted right now,
+   * this is a good security habit if posts ever come from user input
+   * or an external CMS in the future.
+   */
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ─── SEARCH HANDLING ───────────────────────────────────────
+
+  /**
+   * Listens for input events on the search box.
+   * 'input' fires on every keystroke (unlike 'change' which waits for blur).
+   * WHY 'input': Gives the live/instant filtering feel we want.
+   */
+  searchInput.addEventListener("input", function (e) {
+    currentSearch = e.target.value.toLowerCase().trim();
+    renderPosts();
   });
-  currentSpeed = 0.02; // 20% of normal speed
-});
 
-// ─── TIMER (silent, background) ────────────────────────────
+  // ─── FILTER PILL HANDLING ──────────────────────────────────
 
-const ACTIVE_DURATION_MS = 90 * 1000; // 1.5 minutes
-const pageStartTime = Date.now();
+  filterPills.forEach((pill) => {
+    pill.addEventListener("click", function () {
+      // Remove 'active' class from all pills, add to the clicked one
+      filterPills.forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
 
-/**
- * Timer checks silently in the background.
- * When 90 seconds elapse, auto-advance to the next page.
- */
-setInterval(() => {
-  const elapsed = Date.now() - pageStartTime;
-  if (elapsed >= ACTIVE_DURATION_MS) {
-    window.location.href = "page2.html";
+      currentFilter = pill.dataset.filter; // read data-filter="..." attribute
+      renderPosts();
+    });
+  });
+
+  // ─── PROFILE MODAL HANDLING ────────────────────────────────
+
+  /**
+   * openProfileModal() / closeProfileModal()
+   * Toggle the 'open' class which CSS uses to show/hide the overlay.
+   */
+  function openProfileModal() {
+    profileModalOverlay.classList.add("open");
+    profileModalOverlay.setAttribute("aria-hidden", "false");
   }
-}, 1000);
 
-// ─── ANIMATION LOOP ────────────────────────────────────────
+  function closeProfileModal() {
+    profileModalOverlay.classList.remove("open");
+    profileModalOverlay.setAttribute("aria-hidden", "true");
+  }
 
-const run = () => {
-  requestAnimationFrame(run);
+  profileIconBtn.addEventListener("click", openProfileModal);
+  modalClose.addEventListener("click", closeProfileModal);
 
-  // Compute idle wander offset (Lissajous-style motion)
-  let e = elems[0];
-  const ax = (Math.cos(3 * frm) * rad * width) / height;
-  const ay = (Math.sin(4 * frm) * rad * height) / width;
+  // Close modal when clicking the dark overlay (outside the modal box)
+  profileModalOverlay.addEventListener("click", function (e) {
+    if (e.target === profileModalOverlay) closeProfileModal();
+  });
 
-  // Decide chase target: nearest skull if one exists, else pointer
-  const chaseTarget = getNearestSkull() || pointer;
+  // Close modal with the Escape key for accessibility
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeProfileModal();
+  });
 
-  // Head eases toward target with current speed
-  e.x += (ax + chaseTarget.x - e.x) / (10 / currentSpeed);
-  e.y += (ay + chaseTarget.y - e.y) / (10 / currentSpeed);
+  // If a real profile image URL was provided, swap it in
+  if (IMAGE_LINKS.profilePicture) {
+    const modalAvatar = document.querySelector(".modal-avatar");
+    modalAvatar.innerHTML = `<img src="${IMAGE_LINKS.profilePicture}" alt="Profile" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  }
 
-  // Check if head reaches a skull (eating it)
-  for (const skull of skulls) {
-    if (!skull.eaten) {
-      const dx = skull.x - e.x;
-      const dy = skull.y - e.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 30) {
-        skull.eaten = true;
-      }
+  // ─── CHAT WIDGET HANDLING ──────────────────────────────────
+
+  chatBubble.addEventListener("click", function () {
+    chatPanel.classList.toggle("open");
+    const isOpen = chatPanel.classList.contains("open");
+    chatPanel.setAttribute("aria-hidden", String(!isOpen));
+  });
+
+  chatClose.addEventListener("click", function () {
+    chatPanel.classList.remove("open");
+    chatPanel.setAttribute("aria-hidden", "true");
+  });
+
+  /**
+   * chatSend click handler
+   * Currently a placeholder — shows a status message.
+   * EmailJS INTEGRATION: Once you sign up at emailjs.com, replace
+   * the body of this function with:
+   *
+   *   emailjs.send("YOUR_EMAILJS_SERVICE_ID", "YOUR_EMAILJS_TEMPLATE_ID", {
+   *     from_name: chatName.value,
+   *     message: chatMessage.value,
+   *   }, "YOUR_EMAILJS_PUBLIC_KEY")
+   *   .then(() => { chatStatus.textContent = "Message sent!"; })
+   *   .catch(() => { chatStatus.textContent = "Failed to send. Try again."; });
+   *
+   * You'll also need to add this script tag to page0.html <head>:
+   *   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+   * and call emailjs.init("YOUR_PUBLIC_KEY") once on page load.
+   */
+  chatSend.addEventListener("click", function () {
+    const name = chatName.value.trim();
+    const message = chatMessage.value.trim();
+
+    if (!name || !message) {
+      chatStatus.textContent = "Please fill in both fields.";
+      chatStatus.style.color = "#ff4444";
+      return;
     }
-  }
 
-  // Remove eaten skulls
-  skulls = skulls.filter((s) => !s.eaten);
+    // Placeholder behavior until EmailJS is configured (see comment above)
+    chatStatus.textContent = "Message saved locally (EmailJS not yet configured).";
+    chatStatus.style.color = "var(--accent-cyan)";
 
-  // If no skulls remain, reset to normal speed
-  if (skulls.length === 0) {
-    currentSpeed = baseSpeed;
-  }
+    // Clear the fields after "sending"
+    chatName.value = "";
+    chatMessage.value = "";
+  });
 
-  // Body segments follow the head (chain physics)
-  for (let i = 1; i < N; i++) {
-    let e = elems[i];
-    let ep = elems[i - 1];
-    const a = Math.atan2(e.y - ep.y, e.x - ep.x);
-    e.x += (ep.x - e.x + (Math.cos(a) * (100 - i)) / 5) / 4;
-    e.y += (ep.y - e.y + (Math.sin(a) * (100 - i)) / 5) / 4;
-
-    // Scale shrinks toward the tail
-    const s = (162 + 4 * (1 - i)) / 50;
-    e.use.setAttributeNS(
-      null,
-      "transform",
-      `translate(${(ep.x + e.x) / 2},${(ep.y + e.y) / 2}) rotate(${
-        (180 / Math.PI) * a
-      }) translate(${0},${0}) scale(${s},${s})`
-    );
-  }
-
-  // Idle wander grows while pointer is still
-  if (rad < radm) rad++;
-  frm += 0.003;
-
-  // If idle for a long time, gently drift pointer back to center
-  if (rad > 60) {
-    pointer.x += (width / 2 - pointer.x) * 0.05;
-    pointer.y += (height / 2 - pointer.y) * 0.05;
-  }
-};
-
-run();
-
+  // ─── INITIAL RENDER ────────────────────────────────────────
+  renderPosts();
+})();
