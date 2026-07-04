@@ -45,6 +45,9 @@ const resize = () => {
   width = window.innerWidth;
   height = window.innerHeight;
 };
+const SPEED_MULTIPLIER = 1.5; // change this number to speed up/slow down
+let baseSpeed = 0.1 * SPEED_MULTIPLIER;
+let currentSpeed = 0.1 * SPEED_MULTIPLIER;
 
 let width, height;
 window.addEventListener("resize", () => resize(), false);
@@ -83,7 +86,7 @@ for (let i = 1; i < N; i++) {
 
 let skulls = []; // array of skull positions {x, y, eaten}
 let baseSpeed = 0.25; // normal dragon speed
-let currentSpeed = 0.2; // speed multiplier (affected by skull presence)
+let currentSpeed = 0.05; // speed multiplier (affected by skull presence)
 
 /**
  * getNearestSkull()
