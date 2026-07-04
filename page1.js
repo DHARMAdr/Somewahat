@@ -45,9 +45,6 @@ const resize = () => {
   width = window.innerWidth;
   height = window.innerHeight;
 };
-const SPEED_MULTIPLIER = 1.5; // change this number to speed up/slow down
-let baseSpeed = 0.1 * SPEED_MULTIPLIER;
-let currentSpeed = 0.1 * SPEED_MULTIPLIER;
 
 let width, height;
 window.addEventListener("resize", () => resize(), false);
