@@ -82,8 +82,8 @@ for (let i = 1; i < N; i++) {
 // ─── SKULL MECHANIC ────────────────────────────────────────
 
 let skulls = []; // array of skull positions {x, y, eaten}
-let baseSpeed = 0.1; // normal dragon speed
-let currentSpeed = 0.1; // speed multiplier (affected by skull presence)
+let baseSpeed = 0.25; // normal dragon speed
+let currentSpeed = 0.2; // speed multiplier (affected by skull presence)
 
 /**
  * getNearestSkull()
